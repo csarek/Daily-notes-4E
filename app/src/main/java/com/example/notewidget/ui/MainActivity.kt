@@ -24,7 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.notewidget.R
 import com.example.notewidget.data.NoteFileManager
 import com.example.notewidget.ui.components.CompactWeekCalendar
 import com.example.notewidget.ui.components.NoteEditorScreen
@@ -86,12 +88,12 @@ fun FolderSelectorScreen(fileManager: NoteFileManager, onFolderSelected: () -> U
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            "VÃ¡lassz egy mappÃ¡t a teendÅket tartalmazÃ³ txt fÃ¡jlokhoz:",
+            stringResource(R.string.folder_prompt),
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = { launcher.launch(null) }) {
-            Text("Mappa kivÃ¡lasztÃ¡sa")
+            Text(stringResource(R.string.folder_button))
         }
     }
 }
@@ -107,7 +109,7 @@ fun MainScreen(viewModel: MainViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "DÃ¡tum: ${viewModel.selectedDate}",
+            text = stringResource(R.string.date_label, viewModel.selectedDate.toString()),
             style = MaterialTheme.typography.titleLarge
         )
 
