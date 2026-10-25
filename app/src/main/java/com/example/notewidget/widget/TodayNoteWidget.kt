@@ -21,6 +21,7 @@ import androidx.glance.layout.padding
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import com.example.notewidget.R
 import com.example.notewidget.data.NoteFileManager
 import com.example.notewidget.ui.MainActivity
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +38,9 @@ class TodayNoteWidget : GlanceAppWidget() {
             NoteFileManager(context).readNoteForDate(today)
         }.lines().filter { it.isNotBlank() }
 
+        val title = context.getString(R.string.widget_title)
+        val emptyText = context.getString(R.string.widget_empty)
+
         provideContent {
             GlanceTheme {
                 Column(
@@ -47,7 +51,7 @@ class TodayNoteWidget : GlanceAppWidget() {
                         .clickable(actionStartActivity<MainActivity>())
                 ) {
                     Text(
-                        text = "Mai teendÅk",
+                        text = title,
                         style = TextStyle(
                             color = GlanceTheme.colors.onSurface,
                             fontWeight = FontWeight.Bold
@@ -56,7 +60,7 @@ class TodayNoteWidget : GlanceAppWidget() {
                     Spacer(modifier = GlanceModifier.height(8.dp))
                     if (lines.isEmpty()) {
                         Text(
-                            text = "MÃ©g nincsenek mÃ¡ra teendÅk.",
+                            text = emptyText,
                             style = TextStyle(color = GlanceTheme.colors.onSurface)
                         )
                     } else {
