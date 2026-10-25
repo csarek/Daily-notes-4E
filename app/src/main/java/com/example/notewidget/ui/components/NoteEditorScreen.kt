@@ -11,9 +11,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.example.notewidget.R
 
 /**
  * Ha Entert nyomtak egy "- " kezdetÅ± sor vÃ©gÃ©n, az Ãºj sor is "- "-vel indul.
@@ -63,6 +65,6 @@ fun NoteEditorScreen(content: String, onContentChanged: (String) -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = 8.dp),
-        placeholder = { Text("Ãrd ide a teendÅket...") }
+        placeholder = { Text(stringResource(R.string.note_placeholder)) }
     )
 }
