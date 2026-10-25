@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Napi Jegyzet</string>
-    <string name="note_placeholder">Ãrd ide a teendÅket...</string>
-    <string name="folder_prompt">VÃ¡lassz egy mappÃ¡t a teendÅket tartalmazÃ³ txt fÃ¡jlokhoz:</string>
-    <string name="folder_button">Mappa kivÃ¡lasztÃ¡sa</string>
-    <string name="date_label">DÃ¡tum: %1$s</string>
-    <string name="widget_title">Mai teendÅk</string>
-    <string name="widget_empty">MÃ©g nincsenek mÃ¡ra teendÅk.</string>
+    <string name="note_placeholder">\u00cdrd ide a teend\u0151ket...</string>
+    <string name="folder_prompt">V\u00e1lassz egy mapp\u00e1t a teend\u0151ket tartalmaz\u00f3 txt f\u00e1jlokhoz:</string>
+    <string name="folder_button">Mappa kiv\u00e1laszt\u00e1sa</string>
+    <string name="date_label">D\u00e1tum: %1$s</string>
+    <string name="widget_title">Mai teend\u0151k</string>
+    <string name="widget_empty">M\u00e9g nincsenek m\u00e1ra teend\u0151k.</string>
 </resources>
