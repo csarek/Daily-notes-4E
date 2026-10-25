@@ -18,10 +18,18 @@ import androidx.compose.ui.unit.dp
 import com.example.notewidget.R
 
 /**
- * Ha Entert nyomtak egy "- " kezdetÅ± sor vÃ©gÃ©n, az Ãºj sor is "- "-vel indul.
- * Ha az elÅzÅ sor Ã¼res pont volt ("- "), akkor kilÃ©p a listÃ¡bÃ³l.
+ * Minden sor "- "-vel kezdÅdik:
+ * - az elsÅ karakter begÃ©pelÃ©sekor az Ã¼res mezÅben automatikusan megjelenik a "- ",
+ * - Enter utÃ¡n az Ãºj sor is "- "-vel indul,
+ * - ha az elÅzÅ sor Ã¼res pont volt ("- "), az Enter kilÃ©p a listÃ¡bÃ³l (a gondolatjel tÃ¶rlÅdik).
  */
 fun handleBulletPointInput(old: TextFieldValue, new: TextFieldValue): TextFieldValue {
+    // 1) Ãres mezÅbe az elsÅ karakter: tegyÃ¼nk elÃ© gondolatjelet
+    if (old.text.isEmpty() && new.text.isNotEmpty() && !new.text.startsWith("-")) {
+        return TextFieldValue("- " + new.text, TextRange(new.selection.start + 2))
+    }
+
+    // 2) Enter lenyomÃ¡sa
     val cursor = new.selection.start
     val typedEnter = new.text.length == old.text.length + 1 &&
         new.selection.collapsed &&
@@ -32,15 +40,14 @@ fun handleBulletPointInput(old: TextFieldValue, new: TextFieldValue): TextFieldV
     val lineStart = new.text.lastIndexOf('\n', cursor - 2) + 1
     val prevLine = new.text.substring(lineStart, cursor - 1)
 
-    return when {
-        prevLine.trim() == "-" ->
-            TextFieldValue(new.text.removeRange(lineStart, cursor), TextRange(lineStart))
-        prevLine.startsWith("- ") ->
-            TextFieldValue(
-                new.text.substring(0, cursor) + "- " + new.text.substring(cursor),
-                TextRange(cursor + 2)
-            )
-        else -> new
+    return if (prevLine.trim() == "-") {
+        // Ã¼res pont: kilÃ©pÃ©s a listÃ¡bÃ³l
+        TextFieldValue(new.text.removeRange(lineStart, cursor), TextRange(lineStart))
+    } else {
+        TextFieldValue(
+            new.text.substring(0, cursor) + "- " + new.text.substring(cursor),
+            TextRange(cursor + 2)
+        )
     }
 }
 
