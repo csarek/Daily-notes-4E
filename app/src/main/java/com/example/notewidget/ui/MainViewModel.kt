@@ -7,8 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notewidget.data.NoteFileManager
-import com.example.notewidget.widget.TodayNoteWidget
-import androidx.glance.appwidget.updateAll
+import com.example.notewidget.widget.WidgetUpdater
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
@@ -25,7 +24,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val fmt = DateTimeFormatter.ISO_LOCAL_DATE
 
     private var saveJob: Job? = null
-    private var pending: Pair<String, String>? = null // (dÃ¡tum, tartalom)
+    private var pending: Pair<String, String>? = null // (dátum, tartalom)
 
     var selectedDate by mutableStateOf(LocalDate.now())
         private set
@@ -40,7 +39,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private suspend fun read(date: LocalDate): String =
         withContext(Dispatchers.IO) { fileManager.readNoteForDate(date.format(fmt)) }
 
-    /** A kivÃ¡lasztott nap jegyzetÃ©nek ÃºjraolvasÃ¡sa (pl. mappavÃ¡lasztÃ¡s vagy onResume utÃ¡n). */
+    /** A kiválasztott nap jegyzetének újraolvasása (pl. mappaválasztás vagy onResume után). */
     fun reload() {
         viewModelScope.launch {
             if (pending == null) currentContent = read(selectedDate)
@@ -50,7 +49,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun selectDate(date: LocalDate) {
         viewModelScope.launch {
             saveJob?.cancelAndJoin()
-            flush() // a fÃ¼ggÅ mentÃ©s ne vesszen el
+            flush() // a függő mentés ne vesszen el
             selectedDate = date
             currentContent = read(date)
         }
@@ -61,12 +60,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         pending = selectedDate.format(fmt) to text
         saveJob?.cancel()
         saveJob = viewModelScope.launch {
-            delay(500) // debounce: csak gÃ©pelÃ©s szÃ¼netÃ©ben mentÃ¼nk
+            delay(500) // debounce: csak gépelés szünetében mentünk
             flush()
         }
     }
 
-    /** Azonnali mentÃ©s (pl. az app hÃ¡ttÃ©rbe kerÃ¼lÃ©sekor). */
+    /** Azonnali mentés (pl. az app háttérbe kerülésekor). */
     fun flushNow() {
         viewModelScope.launch { flush() }
     }
@@ -77,7 +76,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         withContext(Dispatchers.IO + NonCancellable) {
             fileManager.saveNoteForDate(date, text)
             if (date == LocalDate.now().format(fmt)) {
-                TodayNoteWidget().updateAll(getApplication())
+                WidgetUpdater.push(getApplication(), text)
             }
         }
     }
