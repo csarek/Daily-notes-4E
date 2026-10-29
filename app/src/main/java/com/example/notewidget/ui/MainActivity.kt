@@ -30,6 +30,7 @@ import com.example.notewidget.R
 import com.example.notewidget.data.NoteFileManager
 import com.example.notewidget.ui.components.CompactWeekCalendar
 import com.example.notewidget.ui.components.NoteEditorScreen
+import com.example.notewidget.widget.WidgetRefreshWorker
 
 class MainActivity : ComponentActivity() {
 
@@ -37,6 +38,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WidgetRefreshWorker.schedule(applicationContext)
         setContent {
             MaterialTheme {
                 Surface(
@@ -62,7 +64,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Ha kÃ¶zben mÃ¡s app mÃ³dosÃ­totta a fÃ¡jlt
+        // Ha közben más app módosította a fájlt
         viewModel.reload()
     }
 
