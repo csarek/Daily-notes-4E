@@ -6,4 +6,5 @@
     <string name="date_label">D\u00e1tum: %1$s</string>
     <string name="widget_title">Mai teend\u0151k</string>
     <string name="widget_empty">M\u00e9g nincsenek m\u00e1ra teend\u0151k.</string>
+    <string name="widget_refresh">Friss\u00edt\u00e9s</string>
 </resources>
