@@ -43,13 +43,15 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    // A XML tÃ©ma (Theme.Material3.DayNight) ehhez kell
+    // A XML téma (Theme.Material3.DayNight) ehhez kell
     implementation("com.google.android.material:material:1.11.0")
 
     // Widget
     implementation("androidx.glance:glance-appwidget:1.1.0")
     implementation("androidx.glance:glance-material3:1.1.0")
 
-    // Mappa (SAF) kezelÃ©s
+    // Mappa (SAF) kezelés
     implementation("androidx.documentfile:documentfile:1.0.1")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 }
