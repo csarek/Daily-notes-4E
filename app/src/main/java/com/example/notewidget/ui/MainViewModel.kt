@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.notewidget.data.NoteDate
 import com.example.notewidget.data.NoteFileManager
 import com.example.notewidget.widget.WidgetUpdater
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,7 @@ import java.time.format.DateTimeFormatter
 class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     private val fileManager = NoteFileManager(app)
-    private val fmt = DateTimeFormatter.ISO_LOCAL_DATE
+    private val fmt = NoteDate.formatter
 
     private var saveJob: Job? = null
     private var pending: Pair<String, String>? = null // (dátum, tartalom)
