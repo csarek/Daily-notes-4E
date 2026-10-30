@@ -10,14 +10,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,26 +23,34 @@ import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
 
+// Gyakorlatilag végtelen lista: a lista közepe az 1970-01-01 + EPOCH_OFFSET napnál van,
+// így kb. 1000 évet lehet előre és hátra görgetni. A napok csak görgetéskor jönnek létre.
+private const val EPOCH_OFFSET = 365_000
+private const val TOTAL_DAYS = 730_000
+
+private fun indexToDate(index: Int): LocalDate =
+    LocalDate.ofEpochDay((index - EPOCH_OFFSET).toLong())
+
+private fun dateToIndex(date: LocalDate): Int =
+    (date.toEpochDay() + EPOCH_OFFSET).toInt()
+
 @Composable
 fun CompactWeekCalendar(
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit
 ) {
-    val dates = remember {
-        val today = LocalDate.now()
-        (-3..14).map { today.plusDays(it.toLong()) }
-    }
-    val listState = rememberLazyListState()
-
-    // IndulÃ¡skor a mai napra gÃ¶rget (a lista 4. eleme)
-    LaunchedEffect(Unit) { listState.scrollToItem(3) }
+    // Induláskor a mai nap a 4. helyen látszik (3 nap előzi meg)
+    val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = dateToIndex(LocalDate.now()) - 3
+    )
 
     LazyRow(
         state = listState,
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(dates) { date ->
+        items(count = TOTAL_DAYS) { index ->
+            val date = indexToDate(index)
             val isSelected = date == selectedDate
             val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimary
             else MaterialTheme.colorScheme.onSurfaceVariant
