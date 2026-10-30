@@ -11,6 +11,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.example.notewidget.data.NoteDate
 import com.example.notewidget.data.NoteFileManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,7 +23,7 @@ object WidgetUpdater {
 
     /** A mai nap jegyzetének beolvasása a fájlból. */
     suspend fun readToday(context: Context): String = withContext(Dispatchers.IO) {
-        val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val today = LocalDate.now().format(NoteDate.formatter)
         NoteFileManager(context).readNoteForDate(today)
     }
 
