@@ -22,7 +22,7 @@ class NoteFileManager(private val context: Context) {
         return Uri.parse(s)
     }
 
-    /** Igaz, ha van mentett mappa ÃS az engedÃ©ly mÃ©g Ã©rvÃ©nyes. */
+    /** Igaz, ha van mentett mappa ÉS az engedély még érvényes. */
     fun hasValidRoot(): Boolean {
         val root = getRootUri() ?: return false
         return context.contentResolver.persistedUriPermissions.any {
@@ -35,9 +35,23 @@ class NoteFileManager(private val context: Context) {
         return DocumentFile.fromTreeUri(context, root)
     }
 
+    /**
+     * Megkeresi az adott nap fájlját. Sorrend: 2026_10_30.md, 2026_10_30.txt,
+     * 2026-10-30.md, 2026-10-30.txt. Egyetlen mappa-beolvasással dolgozik.
+     */
+    private fun findNoteFile(dir: DocumentFile, dateString: String): DocumentFile? {
+        val dashed = dateString.replace('_', '-')
+        val candidates = listOf(
+            "$dateString.md", "$dateString.txt",
+            "$dashed.md", "$dashed.txt"
+        )
+        val files = dir.listFiles().filter { it.name in candidates }
+        return candidates.firstNotNullOfOrNull { c -> files.firstOrNull { it.name == c } }
+    }
+
     fun readNoteForDate(dateString: String): String {
         val dir = rootDir() ?: return ""
-        val file = dir.findFile("$dateString.txt") ?: return ""
+        val file = findNoteFile(dir, dateString) ?: return ""
         return try {
             context.contentResolver.openInputStream(file.uri)?.use { input ->
                 input.readBytes().toString(Charsets.UTF_8)
@@ -50,10 +64,10 @@ class NoteFileManager(private val context: Context) {
 
     fun saveNoteForDate(dateString: String, content: String) {
         val dir = rootDir() ?: return
-        val name = "$dateString.txt"
-        val file = dir.findFile(name) ?: dir.createFile("text/plain", name) ?: return
+        val name = "$dateString.${NoteDate.EXTENSION}"
+        val file = findNoteFile(dir, dateString) ?: dir.createFile("text/markdown", name) ?: return
         try {
-            // "wt" = Ã­rÃ¡s + a fÃ¡jl tartalmÃ¡nak tÃ¶rlÃ©se elÅtte
+            // "wt" = írás + a fájl tartalmának törlése előtte
             context.contentResolver.openOutputStream(file.uri, "wt")?.use { out ->
                 out.write(content.toByteArray(Charsets.UTF_8))
             }
