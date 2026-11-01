@@ -17,7 +17,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -25,6 +24,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val fmt = NoteDate.formatter
 
     private var saveJob: Job? = null
+    private var loadJob: Job? = null
     private var pending: Pair<String, String>? = null // (dátum, tartalom)
 
     var selectedDate by mutableStateOf(LocalDate.now())
@@ -33,27 +33,40 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var currentContent by mutableStateOf("")
         private set
 
+    /** Igaz, amíg az új nap jegyzete töltődik (ekkor a szerkesztő csak olvasható). */
+    var isLoading by mutableStateOf(false)
+        private set
+
     init {
-        reload()
+        load()
     }
 
     private suspend fun read(date: LocalDate): String =
         withContext(Dispatchers.IO) { fileManager.readNoteForDate(date.format(fmt)) }
 
-    /** A kiválasztott nap jegyzetének újraolvasása (pl. mappaválasztás vagy onResume után). */
-    fun reload() {
-        viewModelScope.launch {
-            if (pending == null) currentContent = read(selectedDate)
+    /**
+     * A kiválasztott nap betöltése. Előbb elmenti a függő változtatást,
+     * és ha közben új betöltés indul, a régit eldobja.
+     */
+    private fun load() {
+        loadJob?.cancel()
+        isLoading = true
+        val date = selectedDate
+        loadJob = viewModelScope.launch {
+            saveJob?.cancelAndJoin()
+            flush()
+            currentContent = read(date)
+            isLoading = false
         }
     }
 
+    /** Újraolvasás (pl. mappaválasztás vagy onResume után). */
+    fun reload() = load()
+
     fun selectDate(date: LocalDate) {
-        viewModelScope.launch {
-            saveJob?.cancelAndJoin()
-            flush() // a függő mentés ne vesszen el
-            selectedDate = date
-            currentContent = read(date)
-        }
+        if (date == selectedDate) return
+        selectedDate = date // a kijelölés azonnal látszik
+        load()
     }
 
     fun updateContent(text: String) {
