@@ -120,7 +120,8 @@ fun MainScreen(viewModel: MainViewModel) {
         Box(modifier = Modifier.weight(1f)) {
             NoteEditorScreen(
                 content = viewModel.currentContent,
-                onContentChanged = { viewModel.updateContent(it) }
+                onContentChanged = { viewModel.updateContent(it) },
+                readOnly = viewModel.isLoading
             )
         }
     }
