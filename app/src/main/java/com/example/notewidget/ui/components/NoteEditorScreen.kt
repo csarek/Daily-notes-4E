@@ -18,18 +18,18 @@ import androidx.compose.ui.unit.dp
 import com.example.notewidget.R
 
 /**
- * Minden sor "- "-vel kezdÅdik:
- * - az elsÅ karakter begÃ©pelÃ©sekor az Ã¼res mezÅben automatikusan megjelenik a "- ",
- * - Enter utÃ¡n az Ãºj sor is "- "-vel indul,
- * - ha az elÅzÅ sor Ã¼res pont volt ("- "), az Enter kilÃ©p a listÃ¡bÃ³l (a gondolatjel tÃ¶rlÅdik).
+ * Minden sor "- "-vel kezdődik:
+ * - az első karakter begépelésekor az üres mezőben automatikusan megjelenik a "- ",
+ * - Enter után az új sor is "- "-vel indul,
+ * - ha az előző sor üres pont volt ("- "), az Enter kilép a listából (a gondolatjel törlődik).
  */
 fun handleBulletPointInput(old: TextFieldValue, new: TextFieldValue): TextFieldValue {
-    // 1) Ãres mezÅbe az elsÅ karakter: tegyÃ¼nk elÃ© gondolatjelet
+    // 1) Üres mezőbe az első karakter: tegyünk elé gondolatjelet
     if (old.text.isEmpty() && new.text.isNotEmpty() && !new.text.startsWith("-")) {
         return TextFieldValue("- " + new.text, TextRange(new.selection.start + 2))
     }
 
-    // 2) Enter lenyomÃ¡sa
+    // 2) Enter lenyomása
     val cursor = new.selection.start
     val typedEnter = new.text.length == old.text.length + 1 &&
         new.selection.collapsed &&
@@ -41,7 +41,7 @@ fun handleBulletPointInput(old: TextFieldValue, new: TextFieldValue): TextFieldV
     val prevLine = new.text.substring(lineStart, cursor - 1)
 
     return if (prevLine.trim() == "-") {
-        // Ã¼res pont: kilÃ©pÃ©s a listÃ¡bÃ³l
+        // üres pont: kilépés a listából
         TextFieldValue(new.text.removeRange(lineStart, cursor), TextRange(lineStart))
     } else {
         TextFieldValue(
@@ -52,10 +52,14 @@ fun handleBulletPointInput(old: TextFieldValue, new: TextFieldValue): TextFieldV
 }
 
 @Composable
-fun NoteEditorScreen(content: String, onContentChanged: (String) -> Unit) {
+fun NoteEditorScreen(
+    content: String,
+    onContentChanged: (String) -> Unit,
+    readOnly: Boolean = false
+) {
     var value by remember { mutableStateOf(TextFieldValue(content)) }
 
-    // Ha kÃ­vÃ¼lrÅl vÃ¡ltozik a tartalom (mÃ¡sik nap), frissÃ­tjÃ¼k a mezÅt
+    // Ha kívülről változik a tartalom (másik nap), frissítjük a mezőt
     LaunchedEffect(content) {
         if (value.text != content) {
             value = TextFieldValue(content, TextRange(content.length))
@@ -64,6 +68,7 @@ fun NoteEditorScreen(content: String, onContentChanged: (String) -> Unit) {
 
     OutlinedTextField(
         value = value,
+        readOnly = readOnly,
         onValueChange = { new ->
             val processed = handleBulletPointInput(value, new)
             value = processed
